@@ -9,6 +9,7 @@ from functools import lru_cache as _lru_cache
 
 
 class GameJoltAPI:
+    """Interface for the Game Jolt game API."""
     def __init__(self, game_id, private_key, username=None, token=None):
         self._game_id = game_id
         self._private_key = private_key
@@ -50,10 +51,12 @@ class GameJoltAPI:
         :param signed_url: A fully formed url with signature.
         :return: A dict containing the response.
         """
-        # TODO: add error handling here for timeouts, etc.
-        http_response = _urlopen(signed_url)
-        response = _json.loads(http_response.read())['response']
-        return response
+        try:
+            http_response = _urlopen(signed_url)
+            response = _json.loads(http_response.read())['response']
+            return response
+        except Exception as e:
+            return {'success': 'false', 'error': str(e)}
 
     def session_open(self):
         """Open a user session.
@@ -241,8 +244,8 @@ class GameJoltAPI:
         :param public: If True, always operate on public data.
         :return: A `Future` containing the API response.
         """
-        endpoint = _urljoin(self._base_url, "data-store/update/")
         assert operation in ('add', 'subtract', 'multiply', 'divide', 'append', 'prepend')
+        endpoint = _urljoin(self._base_url, "data-store/update/")
         values = self._values.copy()
         values['key'] = key
         values['operation'] = operation
@@ -252,7 +255,7 @@ class GameJoltAPI:
             values['user_token'] = self.token
         return self._submit(endpoint, values)
 
-    def data_store_remove(self, key):
+    def data_store_remove(self, key, public=False):
         """Delete a key and it's data from the data store.
 
         Completely remove a key, and it's data from the data store.
@@ -261,13 +264,14 @@ class GameJoltAPI:
         will be deleted. You can also pass the 'public=True' parameter to
         specifically target the public data for deletion.
 
-        :param key: The key to delete.
+        :param key: The key and its data to delete.
+        :param public: If True, delete a public key and data.
         :return: A `Future` containing the API response.
         """
         endpoint = _urljoin(self._base_url, "data-store/remove/")
         values = self._values.copy()
         values['key'] = key
-        if self.username and self.token:
+        if self.username and self.token and not public:
             values['username'] = self.username
             values['user_token'] = self.token
         return self._submit(endpoint, values)
@@ -280,6 +284,7 @@ class GameJoltAPI:
         You can also pass the 'public=True' parameter to specifically
         retrieve public keys.
 
+        :param public: If True, retrieve the public keys.
         :return: A `Future` containing the API response.
         """
         endpoint = _urljoin(self._base_url, "data-store/get-keys/")
