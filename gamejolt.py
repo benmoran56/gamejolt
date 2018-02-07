@@ -9,8 +9,14 @@ from functools import lru_cache as _lru_cache
 
 
 class GameJoltAPI:
-    """Interface for the Game Jolt game API."""
     def __init__(self, game_id, private_key, username=None, token=None):
+        """Interface for the Game Jolt game API.
+
+        :param game_id: str
+        :param private_key: str
+        :param username: str
+        :param token: str
+        """
         self._game_id = game_id
         self._private_key = private_key
         self.username = username
