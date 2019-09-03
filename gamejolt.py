@@ -107,7 +107,7 @@ class GameJoltAPI:
 
         :param achieved: If True, only fetch achieved trophies.
         :param trophy_id: Fetch a specific trophy, by ID. Setting this
-        will override the `achieved` parameter.
+               will override the `achieved` parameter.
         :return: A `Future` containing the API response.
         """
         endpoint = _urljoin(self._base_url, "trophies/")
@@ -134,19 +134,18 @@ class GameJoltAPI:
         values['trophy_id'] = trophy_id
         return self._submit(endpoint, values)
 
-    def scores_fetch(self, table_id=None, limit=None):
+    def scores_fetch(self, table_id=None, limit=10):
         """Fetch the game scores.
 
         :param table_id: Fetch a specific score table. If None, the
-        default score table will be returned.
+               default score table will be returned.
         :param limit: Set an upper limit on how many scores to return.
-        defaults to 10.
+               Defaults to 10.
         :return: A `Future` containing the API response.
         """
         endpoint = _urljoin(self._base_url, "scores/")
         values = self._values.copy()
-        if limit:
-            values['limit'] = limit
+        values['limit'] = limit
         if table_id:
             values['table_id'] = table_id
         return self._submit(endpoint, values)
@@ -161,9 +160,9 @@ class GameJoltAPI:
 
         :param sort: An int of the score.
         :param score: An optional score display name. If None,
-        defaults to the sort value.
+               defaults to the sort value.
         :param table_id: Add the score to a specific table. If None,
-        defaults to the Main table.
+               defaults to the Main table.
         :return: A `Future` containing the API response.
         """
         endpoint = _urljoin(self._base_url, "scores/add/")
